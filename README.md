@@ -2,7 +2,7 @@
 
 optional 1
 
-to try and debug animation takes about 1 hour
+to try and debug animation takes about 1 hour, 
 to consider game logic take about 0.5 hour
 
 each word from language two is falling down in 4.5s
@@ -14,7 +14,7 @@ right scout is counting to 2 then show winning information, and reset game layou
 user can replay the game
 
 -------------------------------------------
-when have more time ,will do UI Test.
+if have more time, will do UI Test.
 
 and expend the limit of pre-select language word list.
 
