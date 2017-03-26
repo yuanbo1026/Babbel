@@ -30,7 +30,7 @@ public class GamePresenter {
     private List<Word> currentSubWordList = new ArrayList<>();
     private int rightScout = 0;
     private int wrongScout = 0;
-
+    private final int expectedRightScout = 2;
 
     private int randomIndex;
 
@@ -158,10 +158,9 @@ public class GamePresenter {
             updateWrongScout();
         }
     }
-
-    // 2 for test
+    // 2 for testing
     private void checkScout() {
-        if (rightScout == 2) {
+        if (rightScout == expectedRightScout) {
             this.gameActivity.stopGame();
         }
     }
