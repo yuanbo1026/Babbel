@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
         android:layout_centerHorizontal="true"
-        android:textSize="25sp"/>
+        android:textSize="25sp"
+        android:text="qewreqw"/>
 
     <TextView
         android:id="@+id/language_one_text"
