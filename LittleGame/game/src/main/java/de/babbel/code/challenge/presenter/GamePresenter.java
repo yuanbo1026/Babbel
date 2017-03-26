@@ -23,12 +23,15 @@ import rx.schedulers.Schedulers;
 public class GamePresenter {
     private GameActivity gameActivity;
     private DataRepository dataRepository;
-
     private List<Word> wordList = new ArrayList<>();
     private Word currentLanguageOneWord = new Word();
     private Word currentLanguageTwoWord = new Word();
+    private List<Word> currentSubWordList = new ArrayList<>();
     private int right_scout=0;
     private int wrong_scout=0;
+
+
+    private int randomIndex;
 
     @Inject
     public GamePresenter(GameActivity gameActivity, DataRepository dataRepository) {
@@ -43,6 +46,7 @@ public class GamePresenter {
                 .subscribe(new Observer<List<Word>>() {
                     @Override
                     public void onCompleted() {
+
                     }
 
                     @Override
@@ -57,7 +61,12 @@ public class GamePresenter {
                 });
     }
 
-    public void initGameData() {
+    private boolean compareWords() {
+        return currentLanguageOneWord.equals(currentLanguageTwoWord);
+    }
+
+    private void showErrorMessage(String text){
+        this.gameActivity.showErrorMessage(text);
     }
 
     private void setLanguage_one_text(String text) {
@@ -68,36 +77,86 @@ public class GamePresenter {
         gameActivity.setLanguage_two_text(text);
     }
 
+    private void stopAnimation() {
+        gameActivity.stopAnimation();
+    }
+
+    private void startAnimation() {
+        gameActivity.startAnimation();
+        setupLanguageTwoWordTextView();
+    }
+
     private Word getSingleWord(@NonNull List<Word> words) {
-        int i = new Random().nextInt(words.size());
-        return words.get(i);
+        getRandomInt(getRandomIndex(), words.size());
+        return words.get(getRandomIndex());
+    }
+
+    private void getRandomInt(int index, int length) {
+        int i = new Random().nextInt(length);
+        if (index == i) {
+            setRandomIndex(index + 1 >= length ? index - 1 : index + 1);
+        } else {
+            setRandomIndex(i);
+        }
+    }
+
+    private int getIndexOfWord(@NonNull List<Word> words, @NonNull Word word) {
+        return words.indexOf(word);
+    }
+
+    private List<Word> getSubWordList(@NonNull List<Word> words, int index) {
+        List<Word> subList;
+        if (index + 3 > (words.size() - 1)) {
+            subList = words.subList(words.size() - 3, words.size());
+        } else {
+            subList = words.subList(index, index + 3);
+        }
+        return subList;
+    }
+
+    public void initGameContent() {
+        setupLanguageOneWordTextView();
+        setupLanguageTwoWordTextView();
+    }
+
+    private void setupLanguageOneWordTextView() {
+        currentLanguageOneWord = getSingleWord(wordList);
+        currentSubWordList = getSubWordList(wordList, getIndexOfWord(wordList, currentLanguageOneWord));
+        setLanguage_one_text(currentLanguageOneWord.getText_eng());
+    }
+
+    public void setupLanguageTwoWordTextView() {
+        currentLanguageTwoWord = getSingleWord(currentSubWordList);
+        setLanguage_two_text(currentLanguageTwoWord.getText_spa());
     }
 
     public void rightButtonClicked() {
-        if (selectedRightTranslation()) {
-            gameActivity.clearAnimation();
+        if (compareWords()) {
+            stopAnimation();
             setupLanguageOneWordTextView();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            gameActivity.startGame();
+            startAnimation();
             //scout +1
         }
     }
 
-    private void setupLanguageOneWordTextView() {
+    private void updateRightScout(){
+
     }
 
-    public void setupLanguageTwoWordTextView() {
+    private void updateWrongScout(){
+
     }
 
-    private boolean selectedRightTranslation() {
-        return currentLanguageOneWord.equals(currentLanguageTwoWord);
+    private int getRandomIndex() {
+        return randomIndex;
     }
 
-    public void showErrorMessage(String text){
-        this.gameActivity.showErrorMessage(text);
+    private void setRandomIndex(int randomIndex) {
+        this.randomIndex = randomIndex;
     }
 }

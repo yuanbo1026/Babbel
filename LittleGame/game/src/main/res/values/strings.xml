@@ -2,4 +2,5 @@
     <string name="app_name">Little Game</string>
     <string name="right_scout_text">Right Answer :</string>
     <string name="wrong_scout_text">Wrong Answer :</string>
+    <string name="tap_screen_to_start">Tap Screen to start.</string>
 </resources>

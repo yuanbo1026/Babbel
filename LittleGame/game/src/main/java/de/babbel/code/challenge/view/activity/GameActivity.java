@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,10 +30,6 @@ public class GameActivity extends AppCompatActivity {
     TextView right;
     @BindView(R.id.wrong)
     TextView wrong;
-    @BindView(R.id.right_answer_textview)
-    TextView right_answer_textview;
-    @BindView(R.id.wrong_answer_textview)
-    TextView wrong_answer_textview;
 
     @Inject
     GamePresenter presenter;
@@ -45,15 +40,14 @@ public class GameActivity extends AppCompatActivity {
     private ObjectAnimator objectAnimator;
     private boolean isGameRunning = false;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_layout);
         unbinder = ButterKnife.bind(this);
         DaggerGameComponent.builder().gameModule(new GameModule(this)).build().inject(this);
-        initAnimation();
-        startAnimation();
+        presenter.getWordList();
+
     }
 
     @Override
@@ -62,6 +56,26 @@ public class GameActivity extends AppCompatActivity {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         mScreenHeight = displaymetrics.heightPixels;
+        initAnimation();
+    }
+
+    @OnClick(R.id.activity_main)
+    void start() {
+        if (!isGameRunning) {
+            startGame();
+        }
+    }
+
+    @OnClick(R.id.stop)
+    void stop() {
+        if (objectAnimator.isRunning()) {
+            stopAnimation();
+        }
+    }
+
+    @OnClick(R.id.right)
+    void right() {
+        presenter.rightButtonClicked();
     }
 
     private void initAnimation() {
@@ -85,7 +99,7 @@ public class GameActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                Log.d("Animation repeat","Animation repeat");
+                presenter.setupLanguageTwoWordTextView();
             }
         });
         objectAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
@@ -93,52 +107,19 @@ public class GameActivity extends AppCompatActivity {
         objectAnimator.setRepeatMode(ValueAnimator.RESTART);
     }
 
-    @OnClick(R.id.game_frame)
-    public void tapScreen(){
-        if (!isGameRunning) {
-            startGame();
-        }
-    }
-
-    @OnClick(R.id.right)
-    void right() {
-        presenter.rightButtonClicked();
-    }
-
-    public void updateRightScout(String scout){
-        wrong_answer_textview.setText(this.getString(R.string.right_scout_text) + scout);
-    }
-
-    public void updateWrongScout(String scout){
-        wrong_answer_textview.setText(this.getString(R.string.wrong_scout_text) + scout);
-    }
-
-    public void startGame() {
-        presenter.initGameData();
+    private void startGame() {
+        presenter.initGameContent();
         objectAnimator.start();
     }
 
     public void startAnimation() {
         objectAnimator.start();
-        presenter.setupLanguageTwoWordTextView();
     }
 
-    public void clearAnimation() {
+    public void stopAnimation() {
         objectAnimator.cancel();
         language_two_text.clearAnimation();
         language_two_text.setY(0);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbinder.unbind();
-        if (language_two_text != null)
-            language_two_text.clearAnimation();
-    }
-
-    public void showErrorMessage(String message){
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 
     public void setLanguage_two_text(String text){
@@ -147,5 +128,19 @@ public class GameActivity extends AppCompatActivity {
 
     public void setLanguage_one_text(String text){
         language_one_text.setText(text);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
+        if (language_two_text != null && objectAnimator != null){
+            language_two_text.clearAnimation();
+            objectAnimator.cancel();
+        }
+    }
+
+    public void showErrorMessage(String error) {
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }
 }
