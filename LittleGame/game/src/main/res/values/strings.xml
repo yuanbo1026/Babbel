@@ -3,4 +3,9 @@
     <string name="right_scout_text">Right Answer :</string>
     <string name="wrong_scout_text">Wrong Answer :</string>
     <string name="tap_screen_to_start">Tap Screen to start.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
+    <string name="win_text">You got WIN!</string>
+    <string name="right_text">Right Translation : </string>
+    <string name="wrong_text">Wrong Translation : </string>
 </resources>

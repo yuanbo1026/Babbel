@@ -23,11 +23,34 @@
         android:textSize="25sp"
         android:text="@string/tap_screen_to_start" />
 
-    <Button
-        android:id="@+id/right"
+    <TextView
+        android:id="@+id/right_scout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp"
+        android:text="@string/right_text"
+        />
+
+    <TextView
+        android:id="@+id/wrong_scout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="16sp"
+        android:text="@string/wrong_text"
+        android:layout_gravity="start"/>
+
+    <Button
+        android:id="@+id/right"
+        android:layout_width="150dp"
+        android:layout_height="80dp"
         android:layout_gravity="end|bottom"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="18dp"
         android:text="RIGHT"/>
     <Button
         android:id="@+id/wrong"
@@ -36,18 +59,5 @@
         android:layout_gravity="start|bottom"
         android:visibility="gone"
         android:text="WRONG"/>
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:visibility="gone"
-        android:text="STOP"/>
-    <Button
-        android:id="@+id/start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start|top"
-        android:visibility="gone"
-        android:text="START"/>
+
 </FrameLayout>

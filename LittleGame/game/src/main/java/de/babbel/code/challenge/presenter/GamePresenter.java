@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import de.babbel.code.challenge.R;
 import de.babbel.code.challenge.domain.DataRepository;
 import de.babbel.code.challenge.model.Word;
 import de.babbel.code.challenge.view.activity.GameActivity;
@@ -27,8 +28,8 @@ public class GamePresenter {
     private Word currentLanguageOneWord = new Word();
     private Word currentLanguageTwoWord = new Word();
     private List<Word> currentSubWordList = new ArrayList<>();
-    private int right_scout=0;
-    private int wrong_scout=0;
+    private int rightScout = 0;
+    private int wrongScout = 0;
 
 
     private int randomIndex;
@@ -61,11 +62,11 @@ public class GamePresenter {
                 });
     }
 
-    private boolean compareWords() {
+    private boolean selectedRightTranslation() {
         return currentLanguageOneWord.equals(currentLanguageTwoWord);
     }
 
-    private void showErrorMessage(String text){
+    private void showErrorMessage(String text) {
         this.gameActivity.showErrorMessage(text);
     }
 
@@ -86,7 +87,7 @@ public class GamePresenter {
         setupLanguageTwoWordTextView();
     }
 
-    private Word getSingleWord(@NonNull List<Word> words) {
+    private Word getRandomWord(@NonNull List<Word> words) {
         getRandomInt(getRandomIndex(), words.size());
         return words.get(getRandomIndex());
     }
@@ -100,7 +101,7 @@ public class GamePresenter {
         }
     }
 
-    private int getIndexOfWord(@NonNull List<Word> words, @NonNull Word word) {
+    private int getWordIndex(@NonNull List<Word> words, @NonNull Word word) {
         return words.indexOf(word);
     }
 
@@ -114,24 +115,34 @@ public class GamePresenter {
         return subList;
     }
 
-    public void initGameContent() {
+    public void setGameData() {
         setupLanguageOneWordTextView();
         setupLanguageTwoWordTextView();
     }
 
     private void setupLanguageOneWordTextView() {
-        currentLanguageOneWord = getSingleWord(wordList);
-        currentSubWordList = getSubWordList(wordList, getIndexOfWord(wordList, currentLanguageOneWord));
+        currentLanguageOneWord = getRandomWord(wordList);
+        currentSubWordList = getSubWordList(wordList, getWordIndex(wordList, currentLanguageOneWord));
         setLanguage_one_text(currentLanguageOneWord.getText_eng());
     }
 
     public void setupLanguageTwoWordTextView() {
-        currentLanguageTwoWord = getSingleWord(currentSubWordList);
+        currentLanguageTwoWord = getRandomWord(currentSubWordList);
         setLanguage_two_text(currentLanguageTwoWord.getText_spa());
     }
 
+    public void resetRightScout() {
+        rightScout = 0;
+        setRightScout();
+    }
+
+    public void resetWrongScout() {
+        wrongScout = 0;
+        setWrongScout();
+    }
+
     public void rightButtonClicked() {
-        if (compareWords()) {
+        if (selectedRightTranslation()) {
             stopAnimation();
             setupLanguageOneWordTextView();
             try {
@@ -140,16 +151,37 @@ public class GamePresenter {
                 e.printStackTrace();
             }
             startAnimation();
-            //scout +1
+            updateRightScout();
+            checkScout();
+        } else {
+            //wrong scout +1
+            updateWrongScout();
         }
     }
 
-    private void updateRightScout(){
-
+    // 2 for test
+    private void checkScout() {
+        if (rightScout == 2) {
+            this.gameActivity.stopGame();
+        }
     }
 
-    private void updateWrongScout(){
+    private void updateRightScout() {
+        rightScout++;
+        setRightScout();
+    }
 
+    private void setRightScout() {
+        this.gameActivity.setRight_scout_text(String.valueOf(rightScout));
+    }
+
+    private void updateWrongScout() {
+        wrongScout++;
+        setWrongScout();
+    }
+
+    private void setWrongScout() {
+        this.gameActivity.setWrong_scout_text(String.valueOf(wrongScout));
     }
 
     private int getRandomIndex() {
@@ -158,5 +190,14 @@ public class GamePresenter {
 
     private void setRandomIndex(int randomIndex) {
         this.randomIndex = randomIndex;
+    }
+
+    private void showResult(String count) {
+        this.gameActivity.showResult(count);
+    }
+
+    public void countResult() {
+        String message = gameActivity.getString(R.string.win_text);
+        showResult(message);
     }
 }

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.animation.Animation;
@@ -30,6 +31,10 @@ public class GameActivity extends AppCompatActivity {
     TextView right;
     @BindView(R.id.wrong)
     TextView wrong;
+    @BindView(R.id.right_scout)
+    TextView right_scout;
+    @BindView(R.id.wrong_scout)
+    TextView wrong_scout;
 
     @Inject
     GamePresenter presenter;
@@ -47,7 +52,6 @@ public class GameActivity extends AppCompatActivity {
         unbinder = ButterKnife.bind(this);
         DaggerGameComponent.builder().gameModule(new GameModule(this)).build().inject(this);
         presenter.getWordList();
-
     }
 
     @Override
@@ -60,21 +64,14 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.activity_main)
-    void start() {
+    void tapScreenToStart() {
         if (!isGameRunning) {
             startGame();
         }
     }
 
-    @OnClick(R.id.stop)
-    void stop() {
-        if (objectAnimator.isRunning()) {
-            stopAnimation();
-        }
-    }
-
     @OnClick(R.id.right)
-    void right() {
+    void rightButtonClicked() {
         presenter.rightButtonClicked();
     }
 
@@ -108,8 +105,30 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void startGame() {
-        presenter.initGameContent();
-        objectAnimator.start();
+        presenter.setGameData();
+        startAnimation();
+    }
+
+    public void stopGame(){
+        stopAnimation();
+        presenter.countResult();
+    }
+
+    public void showResult(String result) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(result);
+        builder.setPositiveButton(R.string.ok, (dialog, which) -> resetGame());
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
+    private void resetGame(){
+        setLanguage_one_text(this.getString(R.string.tap_screen_to_start));
+        setLanguage_two_text("");
+        presenter.resetRightScout();
+        presenter.resetWrongScout();
     }
 
     public void startAnimation() {
@@ -117,9 +136,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void stopAnimation() {
-        objectAnimator.cancel();
-        language_two_text.clearAnimation();
-        language_two_text.setY(0);
+        if (language_two_text != null && objectAnimator != null) {
+            objectAnimator.cancel();
+            language_two_text.clearAnimation();
+            language_two_text.setY(0);
+        }
     }
 
     public void setLanguage_two_text(String text){
@@ -130,14 +151,20 @@ public class GameActivity extends AppCompatActivity {
         language_one_text.setText(text);
     }
 
+    public void setRight_scout_text(String text){
+        right_scout.setText(getString(R.string.right_text)+text);
+    }
+
+    public void setWrong_scout_text(String text){
+        wrong_scout.setText(getString(R.string.wrong_text)+text);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbinder.unbind();
-        if (language_two_text != null && objectAnimator != null){
-            language_two_text.clearAnimation();
-            objectAnimator.cancel();
-        }
+        objectAnimator = null;
+        presenter = null;
     }
 
     public void showErrorMessage(String error) {
