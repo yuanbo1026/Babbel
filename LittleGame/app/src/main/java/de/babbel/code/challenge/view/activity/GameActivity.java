@@ -1,7 +1,9 @@
-package de.babbel.code.challenge;
+package de.babbel.code.challenge.view.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
+import de.babbel.code.challenge.R;
 
 public class GameActivity extends AppCompatActivity {
 
